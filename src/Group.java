@@ -19,7 +19,36 @@ public class Group {
     private LinkedHashMap<Date,Integer> dates;
     private Date deadline;
 
+
+    public Group(String name) {
+
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost("localhost");
+        Connection connection;
+        try {
+            connection = factory.newConnection();
+            Channel channel = connection.createChannel();
+
+            channel.exchangeDeclare(name, "fanout");
+            String message = "Bienvenue sur Doodle";
+
+            channel.basicPublish(name, "", null, message.getBytes("UTF-8"));
+            System.out.println(" [x] Sent '" + message + "'");
+
+            message = "START";
+
+            channel.basicPublish(name, "", null, message.getBytes("UTF-8"));
+            System.out.println(" [x] Sent '" + message + "'");
+
+        }
+        catch (IOException | TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public Group(String name, String description, LinkedHashMap<Date,Integer> dates, Date deadline) {
+
         //Init scope
         this.name = name;
         this.description = description;
@@ -34,7 +63,7 @@ public class Group {
             Channel channel = connection.createChannel();
 
             channel.exchangeDeclare(this.name, "fanout");
-            String message = "Bienvenue sur le groupe " + this.name;
+            String message = "Bienvenue sur le groupe:" + this.name;
 
             channel.basicPublish(this.name, "", null, message.getBytes("UTF-8"));
             System.out.println(" [x] Sent '" + message + "'");

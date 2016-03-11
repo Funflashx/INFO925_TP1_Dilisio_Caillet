@@ -9,7 +9,6 @@ import java.util.Vector;
  */
 public class User extends Agent{
 
-
     private String username;
     private Vector<Group> groups;
 
@@ -17,6 +16,7 @@ public class User extends Agent{
         super(mailbox);
         this.username = username;
         try {
+            new Thread(new PersonnalMailboxGroup(this, this.getId(), "doodle"));
             new Thread(new PersonnalMailbox(this, this.getId(), mailbox));
         } catch (Exception e) {
             // TODO Auto-generated catch block

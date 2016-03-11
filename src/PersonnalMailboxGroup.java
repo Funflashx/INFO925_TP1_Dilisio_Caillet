@@ -29,7 +29,11 @@ public class PersonnalMailboxGroup implements Runnable{
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
                                        byte[] body) throws IOException {
                 String message = new String(body, "UTF-8");
-                handleMessages(message);
+                try {
+                    handleMessages(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
         };
@@ -37,13 +41,15 @@ public class PersonnalMailboxGroup implements Runnable{
 
     }
 
-    private void handleMessages(String message) {
+    private void handleMessages(String message) throws Exception {
         System.out.println(" [x] Received '" + message + "'");
 
-        if (message.equals("Welcome to group")) {
-            parent.broadcast("group", id + " enters the group");
-        }
-        else if (message.equals("START")) {
+        if (message.equals("Bienvenue sur Doodle")) {
+            parent.broadcast("doodle", id + " se connecte sur Doodle");
+        }else if (message.contains("Bienvenue sur le groupe")){
+            String[] parts = message.split(":");
+            parent.joinGroup(parts[1]);
+            parent.broadcast(parts[1], id + " entre dans le groupe" + parts[1]);
 
         }
     }

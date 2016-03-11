@@ -1,10 +1,15 @@
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import core.Lire;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by François Caillet on 02/03/2016.
@@ -15,6 +20,7 @@ public class Doodle {
     private Vector<Group> groups = new Vector<>();
 
     public Doodle(){
+        groups.add(new Group("doodle"));
         int sousmenu = 0;
         boolean arret = false;
         while (!arret){
@@ -63,6 +69,24 @@ public class Doodle {
                             e.printStackTrace();
                         }
                     }
+                    ConnectionFactory factory = new ConnectionFactory();
+                    factory.setHost("localhost");
+                    Connection connection;
+                    try {
+                        connection = factory.newConnection();
+                        Channel channel = connection.createChannel();
+
+                        String msg = "Bienvenue sur le groupe:" + groupName;
+
+                        channel.basicPublish("doodle", "", null, msg.getBytes("UTF-8"));
+                        System.out.println(" [x] Sent '" + groupName + "'");
+
+                    } catch (IOException | TimeoutException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+
                     groups.add(new Group(groupName,groupDesc,dates,deadline));
 
                 } break;
