@@ -58,15 +58,23 @@ public class Group {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         Connection connection;
+
         try {
             connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
             channel.exchangeDeclare(this.name, "fanout");
-            String message = "Bienvenue sur le groupe:" + this.name;
+            String message = "Bienvenue sur le groupe :" + this.name;
+
 
             channel.basicPublish(this.name, "", null, message.getBytes("UTF-8"));
             System.out.println(" [x] Sent '" + message + "'");
+
+            System.out.println("test: "+this.name);
+            String dates_str = "\nChoisissez une date: \n" + displayDates();
+            channel.basicPublish(this.name, "", null, dates_str.getBytes("UTF-8"));
+            System.out.println(" [x] Sent:'" + dates_str + "'");
+
 
         }
         catch (IOException | TimeoutException e) {
@@ -75,15 +83,28 @@ public class Group {
         }
     }
 
+
     public String displayDates(){
         Collection c = dates.values();
         Iterator<Date> itrKey = dates.keySet().iterator();
         Iterator itrVal = c.iterator();
         String stringDates = "";
+        int i=1;
         while(itrKey.hasNext())
-            stringDates += itrKey.next() + " | " + itrVal.next() + "\n";
+            stringDates +=  i + ") " + itrKey.next() + " | " + itrVal.next() + "\n";
+            i++;
 
         return stringDates;
+    }
+
+    public void voteDate(int i){
+        List<Date> l = new ArrayList<Date>(dates.keySet());
+        for (Date key:dates.keySet()) {
+            if(key.equals(l.get(i))) {
+               dates.put(key,dates.get(key)+1);
+            }
+
+        }
     }
 
     public String getName() {

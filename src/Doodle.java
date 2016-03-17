@@ -21,6 +21,14 @@ public class Doodle {
 
     public Doodle(){
         groups.add(new Group("doodle"));
+        try {
+            new Thread(new DoodleMailbox(this,"mailbox_doodle"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+
         int sousmenu = 0;
         boolean arret = false;
         while (!arret){
@@ -101,6 +109,12 @@ public class Doodle {
             }
         }
     }
+
+
+    public Vector<Group> getGroups() {
+        return groups;
+    }
+
 
     public static void main(String[] args) {
         new Doodle();

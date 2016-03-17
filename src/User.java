@@ -17,7 +17,7 @@ public class User extends Agent{
         this.username = username;
         try {
             new Thread(new PersonnalMailboxGroup(this, this.getId(), "doodle"));
-            new Thread(new PersonnalMailbox(this, this.getId(), mailbox));
+            //new Thread(new DoodleMailbox(this, this.getId(), mailbox));
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
