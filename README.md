@@ -45,5 +45,5 @@ Start System Doodle:
 
 ## Avancement
 
-retardé par different bug la version actuelle n'est pas totalement fonctionnel
+retardé par different bugs la version actuelle n'est pas totalement fonctionnelle <br>
 __(########   75%)__
