@@ -77,7 +77,7 @@ public abstract class Agent {
             channel.exchangeDeclare(exchange, "fanout");
 
             channel.basicPublish(exchange, "", null, message.getBytes("UTF-8"));
-            System.out.println(" ###"+this.mailbox+" broadcasted '" + message + "'");
+            System.out.println(Utils.ANSI_GREEN + "####"+this.mailbox+" broadcasted '" + message + "'" + Utils.ANSI_RESET);
         }
         catch (IOException e) {
             // TODO Auto-generated catch block

@@ -1,5 +1,6 @@
 import com.rabbitmq.client.*;
 import core.Lire;
+import core.Utils;
 
 import java.io.IOException;
 
@@ -45,20 +46,20 @@ public class PersonnalMailboxGroup implements Runnable{
 
     private void handleMessages(String message) throws Exception {
         if(!message.contains(this.parent.getId() + "")) {
-            System.out.println(" [x] Received '" + message + "'");
+            System.out.println(Utils.ANSI_CYAN + "####User " + this.parent.getMailbox() + " receive '"  + message + "'"+ Utils.ANSI_RESET);
         }
 
         if (message.equals("Bienvenue sur Doodle")) {
-            parent.broadcast("doodle", id + " se connecte sur Doodle");
+            parent.broadcast("doodle", this.parent.getMailbox() + " se connecte sur Doodle");
         }else if (message.contains("Bienvenue sur le groupe")){
             String[] parts = message.split(":");
             this.nameGroup = parts[1];
             parent.joinGroup(this.nameGroup);
-            parent.broadcast(this.nameGroup, id + " entre dans le groupe" + parts[1]);
+            parent.broadcast(this.nameGroup, Utils.ANSI_PURPLE + "####" + this.parent.getMailbox() + "entre dans le groupe" + parts[1]+ Utils.ANSI_RESET);
         }else if (message.contains("Choisissez une date")){
             int choix = Lire.i();
             parent.broadcast("mailbox_doodle", "pour le groupe:" + this.nameGroup);
-            parent.broadcast("mailbox_doodle", this.parent.getId() + "a choisi la date numéro:" + choix);
+            parent.broadcast("mailbox_doodle",  Utils.ANSI_PURPLE + "####" + this.parent.getMailbox()  + "a choisi la date numéro:" + choix + Utils.ANSI_RESET);
 
         }
     }

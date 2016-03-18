@@ -1,4 +1,5 @@
 import com.rabbitmq.client.*;
+import core.Utils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -10,10 +11,11 @@ import java.util.concurrent.TimeoutException;
 public class DoodleMailbox implements Runnable {
 
     Doodle doodle;
-    String groupNameCurrent;
+    String groupName;
 
     public DoodleMailbox(Doodle d, String queue_name) throws IOException, TimeoutException {
         this.doodle = d;
+        this.groupName = queue_name;
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         Connection connection = factory.newConnection();
@@ -33,21 +35,20 @@ public class DoodleMailbox implements Runnable {
     }
 
     private void handleMessages(String message) {
-        System.out.println(" [x] Received '" + message + "'");
+        System.out.println(Utils.ANSI_CYAN + "####Group " + this.groupName + " receive '" + message + "'" + Utils.ANSI_RESET);
 
         if (message.contains("a choisi la date numéro:")) {
             int numeroChoisi = Integer.parseInt(message.split(":")[1]);
             for (Group g:this.doodle.getGroups()) {
-                if(g.getName().equals(groupNameCurrent)){
+                if(g.getName().equals(groupName)){
                     g.voteDate(numeroChoisi);
                 }
             }
         }else if (message.contains("pour le groupe")){
-            this.groupNameCurrent = message.split(":")[1];
+            this.groupName = message.split(":")[1];
         }
     }
 
-    @Override
     public void run() {
         // TODO Auto-generated method stub
         while(true) {
