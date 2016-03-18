@@ -21,6 +21,7 @@ public class Group {
     private List<Integer> votes;
     private List<Date> dates;
     private Date deadline;
+    private Channel channel;
 
 
     /**
@@ -39,6 +40,7 @@ public class Group {
 
             channel.exchangeDeclare(name, "fanout");
             String message = "Bienvenue sur Doodle";
+            this.channel = channel;
 
             channel.basicPublish(name, "", null, message.getBytes("UTF-8"));
             System.out.println(Utils.ANSI_GREEN + "####Group " +this.getName()+ " sent '" + message + "'"+Utils.ANSI_RESET);
@@ -79,17 +81,22 @@ public class Group {
         try {
             connection = factory.newConnection();
             Channel channel = connection.createChannel();
+            channel.exchangeDeclare("doodle", "fanout");
+            String message = "New group created : " + this.name;
+            this.channel = channel;
 
-            channel.exchangeDeclare(this.name, "fanout");
-            String message = "Bienvenue sur le groupe : " + this.name;
-
-            channel.basicPublish(this.name, "", null, message.getBytes("UTF-8"));
+            channel.basicPublish("doodle", "", null, message.getBytes("UTF-8"));
             System.out.println(Utils.ANSI_GREEN + "####Group " +this.getName()+ " sent '" + message + "'" + Utils.ANSI_RESET);
 
+            channel.exchangeDeclare(this.name, "fanout");
+
+
             String dates_str = "\nChoisissez une date: \n" + displayDates();
-            channel.basicPublish(this.name, "", null, dates_str.getBytes("UTF-8"));
-            System.out.println(Utils.ANSI_GREEN + "####Group " + this.getName() + " sent:'" +
-                    dates_str + "'" + Utils.ANSI_RESET);
+            System.out.println(this.getName());
+            broadcast(this.getName(), dates_str);
+            //channel.basicPublish(this.name, "", null, dates_str.getBytes("UTF-8"));
+            //System.out.println(Utils.ANSI_GREEN + "####Group " + this.getName() + " sent:'" +
+            //        dates_str + "'" + Utils.ANSI_RESET);
             
         }
         catch (IOException | TimeoutException e) {
@@ -98,7 +105,22 @@ public class Group {
         }
     }
 
+    /**
+     * @param exchange where?
+     * @param message content
+     */
+    public void broadcast(String exchange, String message) {
+        try {
+            channel.exchangeDeclare(exchange, "fanout");
 
+            channel.basicPublish(exchange, "", null, message.getBytes("UTF-8"));
+            System.out.println(Utils.ANSI_GREEN + "####Group '"+this.name+"' broadcasted '" + message + Utils.ANSI_RESET);
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
     public String displayDates(){
         String dates_string = "";
         dates_string += "INDEX\tDATE\t\t\t\t\t\t\tVOTE\n";

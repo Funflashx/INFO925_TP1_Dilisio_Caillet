@@ -29,6 +29,11 @@ Create runnable jar:
  
 ## Run
 
+Before run rabbit-mq:
+```bash
+➜  ~ rabbitmq-server
+```
+
 Start agents :
 ```bash
 ➜  ~ java -jar target/INFO925_T1_Dilisio_Caillet-agent  
@@ -37,5 +42,3 @@ Start System Doodle:
 ```bash
 ➜  ~ java -jar target/INFO925_T1_Dilisio_Caillet-doodle  
 ```
-
-##Utilisation 

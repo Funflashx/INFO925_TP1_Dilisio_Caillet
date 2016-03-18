@@ -17,6 +17,7 @@ public class PersonnalMailboxGroup implements Runnable{
     public PersonnalMailboxGroup(User parent, Long id, String group_name) throws Exception {
         this.id = id;
         this.parent = parent;
+        this.nameGroup = group_name;
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
@@ -45,21 +46,22 @@ public class PersonnalMailboxGroup implements Runnable{
     }
 
     private void handleMessages(String message) throws Exception {
+        System.out.println("receive : " + message);
         if(!message.contains(this.parent.getId() + "")) {
             System.out.println(Utils.ANSI_CYAN + "####User " + this.parent.getMailbox() + " receive '"  + message + "'"+ Utils.ANSI_RESET);
         }
 
         if (message.equals("Bienvenue sur Doodle")) {
             parent.broadcast("doodle", this.parent.getMailbox() + " se connecte sur Doodle");
-        }else if (message.contains("Bienvenue sur le groupe")){
-            String[] parts = message.split(":");
+        }else if (message.contains("New group created")){
+            String[] parts = message.split(" : ");
             this.nameGroup = parts[1];
             parent.joinGroup(this.nameGroup);
-            parent.broadcast(this.nameGroup, Utils.ANSI_PURPLE + "####" + this.parent.getMailbox() + "entre dans le groupe" + parts[1]+ Utils.ANSI_RESET);
+            parent.broadcast(this.nameGroup, this.parent.getMailbox() + " entre dans le groupe");
         }else if (message.contains("Choisissez une date")){
             int choix = Lire.i();
-            parent.broadcast("mailbox_doodle", "pour le groupe:" + this.nameGroup);
-            parent.broadcast("mailbox_doodle",  Utils.ANSI_PURPLE + "####" + this.parent.getMailbox()  + "a choisi la date numéro:" + choix + Utils.ANSI_RESET);
+            parent.broadcast("doodle", "pour le groupe:" + this.nameGroup);
+            parent.broadcast("doodle",  this.parent.getMailbox()  + "a choisi la date numéro:");
 
         }
     }
@@ -68,7 +70,6 @@ public class PersonnalMailboxGroup implements Runnable{
     public void run() {
         // TODO Auto-generated method stub
         while(true) {
-
             try {
                 Thread.sleep(1000);
             }
