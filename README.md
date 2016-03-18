@@ -42,3 +42,8 @@ Start System Doodle:
 ```bash
 ➜  ~ java -jar target/INFO925_T1_Dilisio_Caillet-doodle  
 ```
+
+## Avancement
+
+retardé par different bug la version actuelle n'est pas totalement fonctionnel
+__(########   75%)__
