@@ -1,5 +1,5 @@
 # INFO925_TP1_Dilisio_Caillet
-Doodle-like with RabbitMQ
+Doodle-like with RabbitMQ<br>
 jdk version : 1.8
 
 ##Dependances
@@ -14,6 +14,7 @@ Install Maven :
 ```bash
 ➜  ~ brew install maven
 ```
+(more details @ https://maven.apache.org/install.html)
 
 ## Installation
 
@@ -21,6 +22,7 @@ Install Maven :
 ➜  ~ cd path/to/INFO925_T1_Dilisio_Caillet  
 ```
 
+Create runnable jar:
 ```bash
 ➜  ~ mvn install
 ```
