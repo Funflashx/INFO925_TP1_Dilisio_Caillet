@@ -1,10 +1,12 @@
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-
+import core.Utils;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
+
+import static java.util.Collections.nCopies;
 
 
 /**
@@ -16,12 +18,18 @@ public class Group {
 
     private String name;
     private String description;
-    private LinkedHashMap<Date,Integer> dates;
+    private List<Integer> votes;
+    private List<Date> dates;
     private Date deadline;
 
 
+    /**
+     * DOODLE GROUP CONTRUCTOR
+     * @param name
+     */
     public Group(String name) {
 
+        this.name = name;
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         Connection connection;
@@ -33,12 +41,12 @@ public class Group {
             String message = "Bienvenue sur Doodle";
 
             channel.basicPublish(name, "", null, message.getBytes("UTF-8"));
-            System.out.println(" [x] Sent '" + message + "'");
+            System.out.println(Utils.ANSI_GREEN + "####Group " +this.getName()+ " sent '" + message + "'"+Utils.ANSI_RESET);
 
-            message = "START";
+            message = "GROUP START";
 
             channel.basicPublish(name, "", null, message.getBytes("UTF-8"));
-            System.out.println(" [x] Sent '" + message + "'");
+            System.out.println(Utils.ANSI_GREEN + "####Group " +this.getName()+ " sent '" + message + "'"+Utils.ANSI_RESET);
 
         }
         catch (IOException | TimeoutException e) {
@@ -47,12 +55,21 @@ public class Group {
         }
     }
 
-    public Group(String name, String description, LinkedHashMap<Date,Integer> dates, Date deadline) {
+
+    /**
+     * RDV CONSTRUCTOR
+     * @param name
+     * @param description
+     * @param dates list of dates, to vote
+     * @param deadline end of this sondage
+     */
+    public Group(String name, String description, List<Date> dates, Date deadline) {
 
         //Init scope
         this.name = name;
         this.description = description;
         this.dates = dates;
+        this.votes = new ArrayList<Integer>(nCopies(dates.size(), 0));
         this.deadline = deadline;
 
         ConnectionFactory factory = new ConnectionFactory();
@@ -64,18 +81,16 @@ public class Group {
             Channel channel = connection.createChannel();
 
             channel.exchangeDeclare(this.name, "fanout");
-            String message = "Bienvenue sur le groupe :" + this.name;
-
+            String message = "Bienvenue sur le groupe : " + this.name;
 
             channel.basicPublish(this.name, "", null, message.getBytes("UTF-8"));
-            System.out.println(" [x] Sent '" + message + "'");
+            System.out.println(Utils.ANSI_GREEN + "####Group " +this.getName()+ " sent '" + message + "'" + Utils.ANSI_RESET);
 
-            System.out.println("test: "+this.name);
             String dates_str = "\nChoisissez une date: \n" + displayDates();
             channel.basicPublish(this.name, "", null, dates_str.getBytes("UTF-8"));
-            System.out.println(" [x] Sent:'" + dates_str + "'");
-
-
+            System.out.println(Utils.ANSI_GREEN + "####Group " + this.getName() + " sent:'" +
+                    dates_str + "'" + Utils.ANSI_RESET);
+            
         }
         catch (IOException | TimeoutException e) {
             // TODO Auto-generated catch block
@@ -85,26 +100,18 @@ public class Group {
 
 
     public String displayDates(){
-        Collection c = dates.values();
-        Iterator<Date> itrKey = dates.keySet().iterator();
-        Iterator itrVal = c.iterator();
-        String stringDates = "";
-        int i=1;
-        while(itrKey.hasNext())
-            stringDates +=  i + ") " + itrKey.next() + " | " + itrVal.next() + "\n";
-            i++;
-
-        return stringDates;
+        String dates_string = "";
+        dates_string += "INDEX\tDATE\t\t\t\t\t\t\tVOTE\n";
+        for (int vote: this.votes) {
+            for (Date date: dates){
+                dates_string += this.dates.indexOf(date)+")\t\t"+date.toString()+"\t"+vote+"\n";
+            }
+        }
+        return dates_string;
     }
 
     public void voteDate(int i){
-        List<Date> l = new ArrayList<Date>(dates.keySet());
-        for (Date key:dates.keySet()) {
-            if(key.equals(l.get(i))) {
-               dates.put(key,dates.get(key)+1);
-            }
-
-        }
+        this.votes.set(i,this.votes.get(i)+1);
     }
 
     public String getName() {
